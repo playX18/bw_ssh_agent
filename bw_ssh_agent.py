@@ -196,21 +196,14 @@ class BitwardenSSHAgent:
         """Add an SSH key to the SSH agent."""
         temp_key_file = None
         try:
-            # Create a temporary file to store the key
-            temp_key_file = tempfile.NamedTemporaryFile(mode='wt', delete=False)
-            temp_key_file.write(key_data["sshKey"]["privateKey"])
-            temp_key_file.flush()
-            os.fsync(temp_key_file.fileno())  # Ensure the content is written to disk
-            # Set correct permissions
-            os.chmod(temp_key_file.name, 0o600)
-            
             # Add key to agent with environment variables
             env = os.environ.copy()
             result = subprocess.run(
-                ["ssh-add", temp_key_file.name],
+                ["ssh-add", "-"],
                 capture_output=True,
                 text=True,
-                env=env
+                env=env,
+                input=key_data["sshKey"]["privateKey"]
             )
             
             if result.returncode != 0:
