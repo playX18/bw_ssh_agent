@@ -4,7 +4,6 @@ import json
 import os
 import subprocess
 import sys
-import tempfile
 from pathlib import Path
 from typing import List, Optional, Dict
 
@@ -194,7 +193,6 @@ class BitwardenSSHAgent:
 
     def add_key_to_agent(self, key_data: Dict, key_name: str) -> bool:
         """Add an SSH key to the SSH agent."""
-        temp_key_file = None
         try:
             # Add key to agent with environment variables
             env = os.environ.copy()
@@ -215,11 +213,6 @@ class BitwardenSSHAgent:
         except Exception as e:
             console.print(f"[red]Error adding key {key_name}: {str(e)}[/red]")
             return False
-        finally:
-            # Clean up the temporary file
-            if temp_key_file and os.path.exists(temp_key_file.name):
-                temp_key_file.close()
-                os.unlink(temp_key_file.name)
 
 @click.command()
 @click.option("--verbose", is_flag=True, help="Enable verbose logging")
